@@ -1,0 +1,21 @@
+{
+  "name": "race-track",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "keywords": [],
+  "author": "Matthias Piiri, Erik Allas, Mohamed Sakr",
+  "license": "ISC",
+  "description": "racetrack info screens",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5",
+    "race-track": "file:",
+    "socket.io": "^4.8.1",
+    "winston": "^3.17.0"
+  }
+}

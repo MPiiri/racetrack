@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Control</title>
+    <link rel="stylesheet" href="../styles/race-control.css">
+</head>
+
+<body>
+    <div class="race-control-container">
+        <h1>Race Control</h1>
+
+        <!-- Section for Current Session -->
+        <div class="current-session">
+            <h2>Current Session</h2>
+            <div id="timer" class="timer">10:00</div>
+
+            <table id="current-session-info" class="session-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Mode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="current-session-name">No session active</td>
+                        <td id="current-session-status">N/A</td>
+                        <td id="current-session-mode">N/A</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <!-- Buttons for controlling session statuses -->
+            <div class="session-controls">
+                <h3>Race Session Status</h3>
+                <button class="status-button" id="start-race" data-status="started">Start Race</button>
+                <button class="status-button" id="finish-race" data-status="finished">Finish Race</button>
+                <button class="status-button" id="end-session" data-status="ended">End Session</button>
+            </div>
+
+            <!-- Buttons for changing race modes -->
+            <div class="mode-controls">
+                <h3>Race Modes</h3>
+                <button class="mode-button" id="safe" data-mode="safe">Safe</button>
+                <button class="mode-button" id="hazard" data-mode="hazard">Hazard</button>
+                <button class="mode-button" id="danger" data-mode="danger">Danger</button>
+            </div>
+        </div>
+
+        <!-- Section for Next Session -->
+        <div class="next-session">
+            <h2>Next Session</h2>
+
+            <table id="next-session-info" class="session-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Mode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="next-session-name">No session available</td>
+                        <td id="next-session-status">N/A</td>
+                        <td id="next-session-mode">N/A</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <button id="make-current-button" disabled>Make Current</button>
+        </div>
+    </div>
+
+    <!-- Add container for the leaderboard below the race control buttons -->
+    <div id="leaderboard-container"></div>
+
+    <script>
+        if (!sessionStorage.getItem("authenticatedSafety")) {
+            window.location.href = "../main.html";
+        }
+    </script>
+    <!-- Load the scripts in the correct order -->
+    <script src="/socket.io/socket.io.js"></script> <!-- Socket.io -->
+    <script src="/js/race-control.js"></script> <!-- Race Control -->
+
+</body>
+
+</html>

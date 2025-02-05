@@ -1,0 +1,59 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.race-control-container{
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    text-align: center;
+}
+
+h1{
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+  
+button:hover {
+    background-color: #45a049;
+}
+
+.mode-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#start-race {
+    background-color: #2196F3;
+    color: white;
+}
+
+#finish-race {
+    background-color: #FFC107;
+    color: white;
+}
+
+#end-session {
+    background-color: #F44336;
+    color: white;
+}
+
+.race-screen{
+    width: 100%; 
+    height: 200px; 
+    background-color: white
+}

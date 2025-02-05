@@ -1,0 +1,175 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3 {
+  text-align: center;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+/* Countdown Timer Styling */
+#timer {
+  font-size: 3em; /* Large font size for visibility */
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+  color: #ff5733; /* Bright color for emphasis */
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #fff3e2; /* Light background color */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: left;
+}
+
+.session-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+/* Container Styles */
+.race-control-container {
+  padding: 20px;
+}
+
+.current-session,
+.next-session {
+  margin-bottom: 30px;
+}
+
+.status-button,
+.mode-button,
+#make-current-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin: 5px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 1.1em;
+}
+
+.status-button:hover,
+.mode-button:hover,
+#make-current-button:hover {
+  background-color: #45a049;
+}
+
+/* Disabled Button Styling */
+button:disabled {
+  background-color: #ccc; /* Gray background for disabled state */
+  color: #888; /* Lighter text color to indicate inactivity */
+  cursor: not-allowed; /* Change cursor to indicate non-interactive state */
+  border: 2px solid #bbb; /* Border color to match the disabled look */
+  opacity: 0.7; /* Slight transparency to indicate disabled state */
+  padding: 10px;
+  margin: 5px;
+  width: 100%;
+  font-size: 1.1em;
+}
+
+button:disabled:hover {
+  background-color: #ccc; /* Keep the background color the same on hover */
+  border: 2px solid #bbb; /* Ensure border color remains consistent */
+}
+
+#start-race {
+  background-color: #2196f3;
+  color: white;
+}
+
+#finish-race {
+  background-color: #ffc107;
+  color: white;
+}
+
+#end-session {
+  background-color: #f44336;
+  color: white;
+}
+
+#safe {
+  background-color: #45a049;
+  color: white;
+}
+
+#hazard {
+  background-color: #ffc107;
+  color: white;
+}
+
+#danger {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Media Query for Smaller Screens */
+@media (max-width: 600px) {
+  /* Adjust font sizes for small screens */
+  h1,
+  h2,
+  h3 {
+    font-size: 1.2em;
+  }
+
+  /* Stack elements vertically */
+  .status-button,
+  .mode-button {
+    width: 100%;
+    font-size: 1.1em;
+  }
+
+  #countdown {
+    font-size: 2.5em; /* Slightly smaller on smaller screens */
+    padding: 15px;
+    background-color: #ffebcc; /* Slightly softer background for small screens */
+  }
+
+  /* Table styling */
+  table,
+  th,
+  td {
+    font-size: 0.9em;
+  }
+
+  td {
+    word-wrap: break-word;
+  }
+
+  /* Layout for the buttons */
+  .session-controls,
+  .mode-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Make the "Make Current" button also responsive */
+  #make-current-session {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.1em;
+    margin-top: 10px;
+  }
+}
