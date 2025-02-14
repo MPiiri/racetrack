@@ -1,0 +1,52 @@
+/* Flag container to center content */
+#flag-container {
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black; /* Fallback background */
+}
+*{
+  
+  padding:0;
+  margin:0;
+}
+
+/* Main flag display */
+#flag {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.green-flag {
+  background-color: green;
+}
+
+.yellow-flag {
+  background-color: yellow;
+}
+
+.red-flag {
+  background-color: red;
+}
+
+.chequered-flag {
+  width: 100%;
+  height: 100%;
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/F1_chequered_flag.svg/512px-F1_chequered_flag.svg.png?20220319151751");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+

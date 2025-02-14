@@ -1,0 +1,144 @@
+html {
+  height: calc(100vh - 4px);
+  display: flex;
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  margin: 0;
+  background: linear-gradient(to right, #9f0a0a, #0a9b0a);
+}
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0 10px;
+  height: 100vh;
+  max-width: 1000px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(68, 134, 134);
+  border-radius:20px;
+  border:2px solid white;
+  box-shadow: 3px 0 10px black, -3px 0 10px black;
+}
+#status-banner {
+  color: white;
+  padding: 20px 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  width: 100%;
+  border-radius: 20px;
+  margin-top:10px;
+}
+
+#lap-line-container {
+  margin: 10px 0;
+  display: grid;
+  width: 100%;
+  flex: 1; 
+  gap: 15px;
+}
+
+.car-button {
+  font-size: 5vh;
+  box-sizing: border-box;
+  background-color: #226bb9;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.car-button:disabled {
+  background-color: #5d6d7c3a;
+  cursor: not-allowed;
+  box-shadow:0 0 0 0;
+}
+.car-button:disabled:hover {
+  cursor: not-allowed;
+}
+.car-button:active {
+  transform: scale(0.99);
+}
+.car-button:disabled:active {
+  background-color: #5d6d7c3a;
+}
+@media (min-aspect-ratio: 1/1) {
+  #lap-line-container {
+    grid-auto-flow: row; 
+  }
+
+  #lap-line-container:has(.car-button:nth-child(2)) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(3)) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(4)) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(5)) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(6)) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(7)) {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(8)) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+  }
+}
+
+@media (max-aspect-ratio: 1/1) {
+  #lap-line-container {
+    grid-auto-flow: column; 
+  }
+
+  #lap-line-container:has(.car-button:nth-child(2)) {
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(3)) {
+    grid-template-rows: repeat(3, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(4)) {
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(5)) {
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(6)) {
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(7)) {
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #lap-line-container:has(.car-button:nth-child(8)) {
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

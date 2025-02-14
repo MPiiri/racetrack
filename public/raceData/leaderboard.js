@@ -1,145 +1,84 @@
+// Initialize Socket.IO connection
+const socket = io();
+
 // Session object to hold all race-related data
 let session = {
-  remainingTime: 600, // 10 minutes in seconds
-  updatedFlag: "red-flag", // Initial flag, will be updated dynamically
+  remainingTime: null, // Time in seconds
+  cars: [], // Cars array will be populated dynamically
+  currentFlag: "",
+  status: "",
+  mode:""
 };
 
-// Function to format time as MM:SS.d
+// Function to format time as MM:SS
 function formatTime(timeInSeconds) {
-  if (timeInSeconds === undefined || timeInSeconds === null) return '--:--';
-  const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
-  const seconds = (timeInSeconds % 60).toString().padStart(2, '0');
+  if (timeInSeconds === undefined || timeInSeconds === null) return "--:--";
+  const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, "0");
+  const seconds = (timeInSeconds % 60).toString().padStart(2, "0");
   return `${minutes}:${seconds}`;
 }
 
-// Function to render the leaderboard based on the session object
-function renderLeaderboard() {
-  // Sort leaderboard by fastest lap (ascending)
-  session.cars.sort(
-    (a, b) => (a.fastestLap || Infinity) - (b.fastestLap || Infinity)
-  );
+// Function to update flag status
+function updateFlagBasedOnMode() {
+  session.currentFlag =
+    {
+      safe: "green-flag",
+      hazard: "yellow-flag",
+      danger: "red-flag",
+      ended: "red-flag",
+      finish: "chequered-flag",
+    }[session.status] || "red-flag";
 
-  // Assign positions based on sorted data
-  session.cars.forEach((entry, index) => {
-    entry.position = index + 1; // Positions will be assigned dynamically
-  });
-
-  // Create the leaderboard table
-  let tableHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>Position</th>
-            <th>Driver</th>
-            <th>Car</th>
-            <th>Current Lap</th>
-            <th>Fastest Lap</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-  // Loop through the leaderboard data and populate the rows
-  session.cars.forEach((entry) => {
-    tableHTML += `
-        <tr>
-          <td>${entry.position}</td>
-          <td>${entry.driver}</td>
-          <td>${entry.car}</td>
-          <td>${entry.currentLap || "--"}</td>
-          <td>${formatTime(entry.fastestLap)}</td>
-        </tr>
-      `;
-  });
-
-  tableHTML += `</tbody></table>`;
-
-  // Update the leaderboard container with the table and countdown
-  document.querySelector("#leaderboard-container").innerHTML = `
-      <div class="leaderboard-header">
-        <h1 id="timer">${formatTime(session.remainingTime)}</h1>
-        <h2 id="flag" class="${session.updatedFlag}"></h2>
-      </div>
-      ${tableHTML}
-    `;
+  // Ensure the flag element exists before updating
+  const flagElement = document.getElementById("flag");
+  if (flagElement) {
+    flagElement.className = session.currentFlag;
+  }
 }
 
-// Initialize a connection to the Socket.IO server
-const socket = io();
+// Function to render the leaderboard (Only if it exists on this page)
+function renderLeaderboard() {
+  if (!document.getElementById("leaderboard-body")) return; // Prevent errors if leaderboard does not exist
 
-// Listen for updates from the server and update the session object accordingly
-socket.on(
-  "race-control-update",
-  ({ raceMode, raceSession, remainingTime, currentFlag }) => {
-    console.log(
-      "Race state received:",
-      raceMode,
-      raceSession,
-      remainingTime,
-      currentFlag
-    );
+  session.cars.sort((a, b) => (a.fastestLap || Infinity) - (b.fastestLap || Infinity));
+  session.cars.forEach((entry, index) => {
+    entry.position = index + 1;
+  });
 
-    session.updatedFlag = currentFlag;
-    session.remainingTime = remainingTime;
+  const tbody = document.getElementById("leaderboard-body");
+  tbody.innerHTML = "";
 
-    socket.emit("updateSessionData", session);
+  session.cars.forEach((entry) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${entry.position}</td>
+      <td>${entry.driver}</td>
+      <td>${entry.car}</td>
+      <td>${entry.currentLap || "--"}</td>
+      <td>${formatTime(entry.fastestLap)}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
 
-    renderLeaderboard();
+// Listen for leaderboard & flag updates
+socket.on("currentSessionUpdate", (data) => {
+  session.cars = data.cars;
+  session.remainingTime = data.remainingTime;
+  session.status = data.status;
+  session.status = data.mode;
+
+  // Update leaderboard if it exists
+  if (document.getElementById("timer")) {
+    document.getElementById("timer").textContent = formatTime(session.remainingTime);
   }
-);
 
-// When the race starts
-socket.on("race-started", ({ raceSession, raceMode }) => {
-  console.log(`Race started: ${raceSession}`);
-  socket.emit("updateSessionData", session);
+  // Update flag (this ensures all pages get updates)
+  updateFlagBasedOnMode();
 
+  // Render leaderboard (only if it's on the current page)
   renderLeaderboard();
 });
 
-// Update the leaderboard data
-socket.on("updateLeaderboard", (data) => {
-  // Update the session object with the new leaderboard data
-  session.cars = data; // Update the cars array with new data
-
-  // Emit updated session data back to server
-  socket.emit("updateSessionData", session);
-
-  renderLeaderboard(); // Re-render leaderboard with updated cars data
-});
-
-// Update the countdown timer
-socket.on("updateCountdown", (time) => {
-  session.remainingTime = time; // Update remaining time in session object
-  // Emit updated session data back to server
-  socket.emit("updateSessionData", session);
-
-  document.querySelector("#timer").textContent = formatTime(
-    session.remainingTime
-  ); // Update the displayed countdown
-});
-
-// Update the flag (new flag event logic)
-socket.on("updateFlag", (flag) => {
-  session.updatedFlag = flag; // Update the flag in session object
-
-  // Emit updated session data back to server
-  socket.emit("updateSessionData", session);
-
-  renderLeaderboard(); // Re-render leaderboard when the flag is updated
-});
-
-// When the race finishes
-socket.on("race-finished", () => {
-  console.log("Race finished");
-  session.updatedFlag = "chequered-flag"; // Set the flag to chequered when the race finishes
-
-  // Emit updated session data back to server
-  socket.emit("updateSessionData", session);
-
-  renderLeaderboard(); // Re-render leaderboard when race is finished
-});
-
-// Initial render of the leaderboard
-window.onload = function () {
-  renderLeaderboard(); // Initial render when the page is loaded
-};
+// Initial render on page load (only if leaderboard exists)
+window.onload = renderLeaderboard;

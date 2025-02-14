@@ -1,25 +1,22 @@
+require("dotenv").config();
 const logger = require("./logger"); // Import the logger
 const safeStringify = require("./utility/safeStringify");
 const RaceSession = require("../models/RaceSession");
 const {
   findRaceSessions,
   findSessionByStatus,
-  findSessionById,
   createRaceSession,
   updateRaceSession,
-  updateSessionStatus,
-  updateSessionMode,
   deleteRaceSession,
 } = require("./raceSessionService");
+const raceTime = process.env.NODE_ENV === "development" ? 60 : 600;
 
 async function initSocket(io) {
   let raceSessions = null;
   let currentSession = null;
   let nextSession = null;
   let countdownTimer = null;
-  let remainingTime = 600; // Default 10 minutes in seconds
-  let raceMode = "safe"; // Default mode is safe
-  let currentFlag = "red-flag"; // Default to green flag
+  let remainingTime = raceTime; // Default 10 minutes in seconds
 
   // Initialize sessions
   async function initializeSessions() {
@@ -32,8 +29,6 @@ async function initSocket(io) {
       logger.error("Error initializing sessions: " + error.message);
     }
   }
-
-  let leaderboardData = []; // Define your leaderboard data here
 
   async function fetchRaceSessions() {
     try {
@@ -63,31 +58,9 @@ async function initSocket(io) {
       currentSession = await RaceSession.findOne({ status: "current" });
 
       if (currentSession) {
-        leaderboardData = currentSession.cars
-          .map((car) => ({
-            driver: car.driver,
-            car: car.car,
-            fastestLap: car.fastestLap,
-          }))
-          .sort((a, b) => parseFloat(a.fastestLap) - parseFloat(b.fastestLap));
-
-        raceMode = currentSession.mode;
-        remainingTime = currentSession.remainingTime;
-        startCountdown();
-
-        updateFlagBasedOnMode();
-        io.emit("updateCountdown", remainingTime); // Send updated time to clients
-        io.emit("updateLeaderboard", leaderboardData);
         io.emit("currentSessionUpdate", currentSession);
       } else {
         currentSession = null;
-        leaderboardData = [];
-        raceMode = "danger";
-        remainingTime = 0;
-
-        updateFlagBasedOnMode();
-        io.emit("updateCountdown", remainingTime); // Send updated time to clients
-        io.emit("updateLeaderboard", leaderboardData);
         io.emit("currentSessionUpdate", null);
         logger.warn("No current session found.");
       }
@@ -96,43 +69,9 @@ async function initSocket(io) {
     }
   }
 
-  // Update current session and leaderboard data every second
-  // setInterval(fetchCurrentSession, 1000);
-
-  // TODO do we need this handling logic?
-  async function handleNextSession(session) {
-    // If the incoming session is marked as "next"
-    if (session.status === "next") {
-      // If there's already a "next" session, update its status to "ready"
-      if (nextSession && nextSession._id !== session._id) {
-        const currentNextSession = await RaceSession.findById(nextSession._id);
-        if (currentNextSession) {
-          currentNextSession.status = "ready";
-          currentNextSession.mode = "danger";
-          await updateRaceSession(currentNextSession._id, currentNextSession);
-        }
-      }
-    }
-  }
-
-  // Function to update the flag based on the current race mode
-  function updateFlagBasedOnMode() {
-    currentFlag =
-      {
-        safe: "green-flag",
-        hazard: "yellow-flag",
-        danger: "red-flag",
-        ended: "red-flag",
-        finish: "chequered-flag",
-      }[raceMode] || "green-flag";
-
-    logger.debug("updateFlag: " + currentFlag);
-    io.emit("updateFlag", currentFlag); // Emit flag update to clients
-  }
-
   // Start countdown and emit time updates
   function startCountdown() {
-    remainingTime = currentSession ? currentSession.remainingTime : 600; // Reset time to 10 minutes
+    remainingTime = currentSession ? currentSession.remainingTime : raceTime; // Reset time to 10 minutes
 
     if (countdownTimer) clearInterval(countdownTimer); // Clear existing countdown
 
@@ -146,8 +85,7 @@ async function initSocket(io) {
             currentSession._id,
             currentSession
           );
-          await fetchCurrentSession();
-          await fetchRaceSessions();
+          io.emit("currentSessionUpdate", currentSession);
         } catch (error) {
           logger.error("Error starting the countdown: ", error);
         }
@@ -171,18 +109,8 @@ async function initSocket(io) {
 
     try {
       currentSession.mode = "safe";
-      raceMode = "safe";
 
-      updateFlagBasedOnMode(); // Update the flag based on the race mode
       startCountdown(); // Start the countdown timer
-
-      // Persist update
-      currentSession = await updateRaceSession(
-        currentSession._id,
-        currentSession
-      );
-      await fetchCurrentSession();
-      await fetchRaceSessions();
     } catch (error) {
       logger.error("Error starting the race: ", error);
     }
@@ -197,8 +125,7 @@ async function initSocket(io) {
 
     try {
       currentSession.mode = "finish";
-      raceMode = "finish";
-      updateFlagBasedOnMode(); // Update the flag based on the race mode
+      // raceMode = "finish";
 
       clearInterval(countdownTimer); // Clear the countdown timer
       currentSession.remainingTime = 0;
@@ -210,13 +137,10 @@ async function initSocket(io) {
         currentSession
       );
 
-      await fetchCurrentSession();
-      await fetchRaceSessions();
+      io.emit("currentSessionUpdate", currentSession);
     } catch (error) {
       logger.error("Error finishing the race: ", error);
     }
-
-    updateFlagBasedOnMode(); // Update the flag based on the race mode
   }
 
   // End session
@@ -231,18 +155,13 @@ async function initSocket(io) {
       logger.debug("Ending session: " + currentSession);
       currentSession.mode = "ended";
 
-      clearInterval(countdownTimer); // Clear the countdown timer
-      currentSession.remainingTime = 0;
-      remainingTime = 0;
-
       // Persist update
       currentSession = await updateRaceSession(
         currentSession._id,
         currentSession
       );
 
-      await fetchCurrentSession();
-      await fetchRaceSessions();
+      io.emit("currentSessionUpdate", currentSession);
     } catch (error) {
       logger.error("Error ending the session: ", error);
     }
@@ -253,20 +172,6 @@ async function initSocket(io) {
     logger.info(`socket.js connected: ${socket.id}`);
 
     await initializeSessions();
-
-    socket.emit("updateLeaderboard", leaderboardData); // Send current leaderboard to the new client
-    // Handle adding a driver to the leaderboard manually
-    socket.on(
-      "addDriverToLeaderboard",
-      ({ driverName, carModel, fastestLap }) => {
-        // Manually add a driver to the leaderboard
-        const newDriver = { driver: driverName, car: carModel, fastestLap };
-        leaderboardData.push(newDriver);
-
-        // Emit updated leaderboard to all connected clients
-        socket.emit("updateLeaderboard", leaderboardData);
-      }
-    );
 
     // Handle updating next session
     socket.on("nextSessionUpdate", (session) => {
@@ -305,17 +210,6 @@ async function initSocket(io) {
     socket.on("setCurrentSession", async (session) => {
       logger.debug("[S] Set current session to: " + safeStringify(session));
 
-      if (currentSession) {
-        try {
-          currentSession.status = "ready";
-          currentSession.status = "danger";
-          await updateRaceSession(currentSession._id, currentSession);
-        } catch (error) {
-          logger.error("Error updating current session: ", error);
-          socket.emit("sessionUpdateError", "Failed to set current session");
-        }
-      }
-
       if (!session) {
         currentSession = null;
         return socket.emit("currentSessionUpdate", null);
@@ -335,30 +229,6 @@ async function initSocket(io) {
       } catch (error) {
         logger.error("Error setting current session: ", error);
         socket.emit("sessionUpdateError", "Failed to set current session");
-      }
-    });
-
-    // Update current session
-    socket.on("updateCurrentSession", async (session) => {
-      logger.info("Updating current session: " + session);
-      if (!session) {
-        return socket.emit(
-          "sessionUpdateError",
-          "Invalid current session data provided for update."
-        );
-      }
-
-      try {
-        // Persist update
-        currentSession = await updateRaceSession(session._id, session);
-
-        // Emit updates
-
-        await fetchRaceSessions();
-        await fetchCurrentSession();
-      } catch (error) {
-        logger.error("Error updating current session: ", error);
-        socket.emit("sessionUpdateError", "Failed to update current session");
       }
     });
 
@@ -385,9 +255,6 @@ async function initSocket(io) {
 
       try {
         currentSession.mode = mode;
-        raceMode = mode; //update mode
-
-        updateFlagBasedOnMode(); // Update the flag based on the race mode
 
         // Persist update
         currentSession = await updateRaceSession(
@@ -395,8 +262,7 @@ async function initSocket(io) {
           currentSession
         );
 
-        await fetchCurrentSession();
-        await fetchRaceSessions();
+        io.emit("currentSessionUpdate", currentSession);
       } catch (error) {
         logger.error("Error changing the race mode: ", error);
       }
@@ -418,8 +284,9 @@ async function initSocket(io) {
     socket.on("createRaceSession", async (sessionData) => {
       try {
         logger.debug("[S] Creating race session: " + sessionData);
-        const newSession = await createRaceSession(sessionData);
-        await handleNextSession(newSession);
+
+        await createRaceSession(sessionData);
+
         await fetchNextSession();
         await fetchRaceSessions();
       } catch (error) {
@@ -435,12 +302,8 @@ async function initSocket(io) {
           "[S] Updating race session: " + safeStringify(sessionData)
         );
 
-        const updatedSession = await updateRaceSession(
-          sessionData._id,
-          sessionData
-        );
+        await updateRaceSession(sessionData._id, sessionData);
 
-        await handleNextSession(updatedSession);
         await fetchNextSession();
         await fetchRaceSessions();
       } catch (error) {
@@ -463,6 +326,44 @@ async function initSocket(io) {
       }
     });
 
+    // Record laptime and fastest lap
+    socket.on("recordLap", async ({ car, currentTime }) => {
+      if (!currentSession) {
+        logger.error("No current session to record laptime.");
+        return;
+      }
+
+      let carData = currentSession.cars.find((c) => c.car === car);
+      if (!carData) {
+        logger.error(`Car ${car} not found in current session.`);
+        return;
+      }
+
+      if (!carData.lastLapTime) {
+        carData.lastLapTime = currentTime;
+        carData.currentLap = 1;
+        await updateRaceSession(currentSession._id, currentSession);
+        await fetchCurrentSession();
+        return;
+      }
+
+      const lapTime = (currentTime - carData.lastLapTime) / 1000;
+      carData.lastLapTime = currentTime;
+
+      if (!carData.fastestLap || lapTime < carData.fastestLap) {
+        carData.fastestLap = lapTime;
+      }
+
+      carData.currentLap += 1;
+
+      currentSession = await updateRaceSession(
+        currentSession._id,
+        currentSession
+      ); // Persist update
+
+      io.emit("currentSessionUpdate", currentSession);
+    });
+
     socket.on("disconnect", () => {
       logger.warn(`socket.js disconnected: ${socket.id}`);
     });
@@ -472,6 +373,15 @@ async function initSocket(io) {
       // Emit initial data
       initializeSessions();
     });
+
+    // start the clock
+    if (
+      currentSession &&
+      currentSession.mode !== "finish" &&
+      currentSession.mode !== "ended"
+    ) {
+      startCountdown();
+    }
   });
 }
 

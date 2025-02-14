@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lap Line</title>
+  <link rel="stylesheet" href="../styles/lapLine.css">
+</head>
+
+<body>
+  <div id="status-banner">Welcome</div>
+  <div id="lap-line-container"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="../js/lapLine.js"></script>
+  <script>
+    if (!sessionStorage.getItem("authenticatedLap")) {
+      window.location.href = "../main.html";
+    }
+  </script>
+</body>
+
+</html>

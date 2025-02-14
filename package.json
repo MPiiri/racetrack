@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "server/server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "dev": "nodemon server/server.js"
+    "start": "cross-env NODE_ENV=production node server/server.js ",
+    "dev": "cross-env NODE_ENV=development nodemon server/server.js"
   },
   "keywords": [],
   "author": "Matthias Piiri, Erik Allas, Mohamed Sakr",
@@ -17,5 +17,9 @@
     "race-track": "file:",
     "socket.io": "^4.8.1",
     "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.9"
   }
 }

@@ -1,49 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Role Selection</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Role Selection</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
+  <body>
+    <div class="container">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-button active-tab" id="guest-tab">Guest</button>
+        <button class="tab-button" id="employee-tab">Employee</button>
+      </div>
 
-<body>
-  <div class="container">
-    <!-- Guest Section -->
-    <div id="guest" class="half">
-      <h2>Guest</h2>
-      <div id="guest-form" class="form-container">
-        <select id="guest-role">
-          <option value="Interface/leaderboard.html">Leaderboard</option>
-          <option value="Interface/countdown.html">Countdown</option>
-          <option value="Interface/raceFlag.html">Race Flag</option>
-          <option value="Interface/nextRace.html">Next Race</option>
-
-        </select>
-        <div id="guest-display" class="display-container">
-          <iframe id="guest-iframe" src="./Interface/leaderboard.html" title="Guest View" loading="lazy"></iframe>
+      <!-- Tab Content -->
+      <div id="guest-content" class="tab-content active-content">
+        <div class="form-container">
+          <select id="guest-role">
+            <option value="Interface/leaderboard.html">Leaderboard</option>
+            <option value="Interface/countdown.html">Countdown</option>
+            <option value="Interface/raceFlag.html">Race Flag</option>
+            <option value="Interface/nextRace.html">Next Race</option>
+          </select>
+          <div id="guest-display" class="display-container">
+            <iframe
+              id="guest-iframe"
+              src="./Interface/leaderboard.html"
+              title="Guest View"
+              loading="lazy"
+            ></iframe>
+          </div>
+          <button id="fullscreen-btn">Fullscreen</button>
         </div>
-        <button id="fullscreen-btn">Fullscreen</button>
+      </div>
+
+      <div id="employee-content" class="tab-content">
+        <div class="form-container">
+          <select id="employee-job">
+            <option value="Receptionist">Receptionist</option>
+            <option value="Lap-line Observer">Lap-line Observer</option>
+            <option value="Safety Official">Safety Official</option>
+          </select>
+          <input
+            type="password"
+            id="employee-password"
+            placeholder="Enter your password"
+          />
+          <button id="employee-submit">Submit</button>
+        </div>
       </div>
     </div>
 
-    <!-- Employee Section -->
-    <div id="employee" class="half">
-      <h2>Employee</h2>
-      <div id="employee-form" class="form-container">
-        <select id="employee-job">
-          <option value="Receptionist">Receptionist</option>
-          <option value="Lap-line Observer">Lap-line Observer</option>
-          <option value="Safety Official">Safety Official</option>
-        </select>
-        <input type="password" id="employee-password" placeholder="Enter your password" />
-        <button id="employee-submit">Submit</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="main.js"></script>
-</body>
-
+    <script src="main.js"></script>
+  </body>
 </html>

@@ -1,88 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Countdown Timer</title>
-    <link rel="stylesheet" href="../styles.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
+    <link rel="stylesheet" href="../styles/nextRace.css" />
+  </head>
 
-        /* Ensure the timer resizes properly on smaller screens */
-        @media (max-width: 768px) {
-            #timer {
-                font-size: 30vw;
-                /* Larger text for smaller screens */
-            }
-        }
-    </style>
-</head>
-
-<body>
+  <body>
     <h2>
-        Next Race
-        <div id="call"></div>
+      Next Race
+      <div id="call"></div>
     </h2>
     <table>
-        <thead>
-            <tr>
-                <th>Driver</th>
-                <th>Car</th>
-            </tr>
-        </thead>
-        <tbody id="sessionTableBody">
-        </tbody>
+      <thead>
+        <tr>
+          <th>Driver</th>
+          <th>Car</th>
+        </tr>
+      </thead>
+      <tbody id="sessionTableBody"></tbody>
     </table>
     <script src="/socket.io/socket.io.js"></script>
 
-
-    <script>
-        const socket = io();
-        let next = null;
-
-        socket.on("connect", () => {
-            socket.emit("getNextSession");
-            socket.emit("getCurrentSession");
-        });
-
-        socket.on("nextSessionUpdate", (nextSession) => {
-            const tableBody = document.getElementById("sessionTableBody");
-            tableBody.innerHTML = "";
-            next = nextSession;
-
-            if (nextSession && nextSession.cars) {
-                nextSession.cars.forEach(car => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `<td>${car.driver}</td><td>${car.car}</td>`;
-                    tableBody.appendChild(row);
-                });
-            } else {
-                tableBody.innerHTML = "<tr><td colspan='2'>No upcoming session</td></tr>";
-            }
-        });
-
-        socket.on("currentSessionUpdate", (currentSession) => {
-            setTimeout(() => {
-                if (currentSession.mode === "ended" && next) { // Ensure 'next' exists
-                    const call = document.getElementById("call");
-                    call.innerText = "\n Drivers, please go to your assigned cars!";
-                } else {
-                    const call = document.getElementById("call");
-                    call.innerText = "";
-                }
-            }, 100);
-        });
-
-    </script>
-</body>
-
+    <script src="../raceData/nextRace.js"></script>
+  </body>
 </html>

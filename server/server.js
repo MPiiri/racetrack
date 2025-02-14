@@ -13,6 +13,14 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 require("dotenv").config();
+const requiredEnvs = ["RECEPTIONIST_PASSWORD", "LAP_LINE_OBSERVER_PASSWORD", "SAFETY_OFFICIAL_PASSWORD"];
+const missingEnvs = requiredEnvs.filter(env => !process.env[env]);
+
+if (missingEnvs.length > 0) {
+    console.error(`Missing required environment variables: ${missingEnvs.join(", ")}`);
+    process.exit(1); // Exit with error
+}
+
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");

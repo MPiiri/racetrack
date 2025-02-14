@@ -1,0 +1,17 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+
+#timer {
+  font-size: 28vw;
+}
+*{
+  
+  padding:0;
+  margin:0;
+}

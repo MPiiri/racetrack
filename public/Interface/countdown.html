@@ -5,48 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Countdown Timer</title>
-  <link rel="stylesheet" href="../styles.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f0f0f0;
-    }
-    /* Ensure the timer resizes properly on smaller screens */
-    @media (max-width: 768px) {
-      #timer {
-        font-size: 30vw; /* Larger text for smaller screens */
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="../styles/countdown.css">
 </head>
 
 <body>
   <div id="timer" class="timer">--:--</div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const timerDisplay = document.getElementById("timer");
-
-    // Function to format time as MM:SS
-    function formatTime(timeInSeconds) {
-      if (timeInSeconds === undefined || timeInSeconds === null) return '--:--';
-      const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
-      const seconds = (timeInSeconds % 60).toString().padStart(2, '0');
-      return `${minutes}:${seconds}`;
-    }
-
-    // Connect to the Socket.IO server
-    const socket = io();
-
-    // Listen for the 'updateCountdown' event
-    socket.on("updateCountdown", (remainingTime) => {
-      timerDisplay.textContent = formatTime(remainingTime);
-    });
+  <script src="../raceData/leaderboard.js">
+    
   </script>
 </body>
 

@@ -1,4 +1,6 @@
+require("dotenv").config();
 const winston = require("winston");
+const logLevel = process.env.NODE_ENV === "development" ? "debug" : "info";
 
 // Define custom colors
 winston.addColors({
@@ -10,7 +12,7 @@ winston.addColors({
 
 // Define the logger with timestamp and log levels
 const logger = winston.createLogger({
-  level: "debug", //logLevel, // Set the minimum log level ("info", "warn", "error", "debug")
+  level: logLevel, // Set the minimum log level ("info", "warn", "error", "debug")
   format: winston.format.combine(
     winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     winston.format.printf(({ timestamp, level, message }) => {
